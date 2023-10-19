@@ -2,22 +2,24 @@
 
 #include <Angel.h>
 
-//Number of vertices for the triangle
+// Define initial angle of rotation.
+GLfloat theta = 0.0;
+// Location to update the rotation angle in the shader.
+GLint thetaLoc;
+// Number of vertices for the triangle
 const int NUMVERTICES = 3;
 
 void init()
 {
     vec2 points[NUMVERTICES] = {
+        vec2(0.0, 1.0),
         vec2(-1.0, -1.0),
         vec2(1.0, -1.0),
-        vec2(0.0, 1.0),
     };
-    
-
 
     //***********************************
 
-    /*The following chunk of code creates a vertex array 
+    /*The following chunk of code creates a vertex array
     object and sets it as the current/active one*/
     // Vertex array object stores states of vertices.
     GLuint vao[1];
@@ -36,7 +38,6 @@ void init()
     // Copy our vertex data to the active buffer (note: `points` has static size).
     glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 
-
     // Load vertex and fragment shaders and create a shader program.
     GLuint program = InitShader("vshader.glsl", "fshader.glsl");
     // Use the just-created shader program.
@@ -50,7 +51,7 @@ void init()
     glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
     // Get the location of the rotation angle in the shader.
-    //thetaLoc = glGetUniformLocation(program, "uTheta");
+    thetaLoc = glGetUniformLocation(program, "uTheta");
 
     // Set the clear color to black.
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -60,31 +61,45 @@ void init()
 
 void display()
 {
-    // Draw the triangle using a triangle.
-    glDrawArrays(GL_TRIANGLES, 0, NUMVERTICES);
+    // Clear the color buffer.
+    glClear(GL_COLOR_BUFFER_BIT);
+    // Set the rotation angle in the shader.
+    glUniform1f(thetaLoc, theta);
 
-    
-    //*************************************
+    // Draw the triangle using a triangle.
+    glDrawArrays(GL_TRIANGLE_FAN, 0, NUMVERTICES);
+
     // Swap the front and back buffers (double buffering).
     glutSwapBuffers();
-    //*************************************
 }
 
-/*
 // Updates the object shape?
 void idle()
 {
+    // Increment the rotation angle.
+    theta += 0.01;
     // Redraw the scene.
     glutPostRedisplay();
 }
-*/
-
 
 void keyboard(unsigned char key, int x, int y)
 {
-    // Switch statement here
+    switch (key)
+    {
+    case 033: // Escape key (in octal)
+        // Close the program.
+        exit(EXIT_SUCCESS);
+        break;
+    case 'e': // 'e' key
+        // Stop calling the idle function, stops the animation.
+        glutIdleFunc(0);
+        break;
+    case 's': // 's' key
+        // Start calling the idle function, starts the animation.
+        glutIdleFunc(idle);
+        break;
+    }
 }
-
 
 int main(int argc, char **argv)
 {

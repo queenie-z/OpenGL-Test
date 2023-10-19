@@ -8,16 +8,8 @@ CFLAGS=-Iinclude -std=c++11 -g
 LIBS=-lglut -lGLEW -lGL -lGLU
 
 # Default target executed when no arguments are given to make.
-default_target: spin-sq objTest
+default_target: objTest
 .PHONY: default_target
-
-# Target for linking the spin-sq.o and InitShader.o files.
-spin-sq: spin-sq.o InitShader.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
-
-# Target for compiling the spin-sq.cpp file.
-spin-sq.o: spin-sq.cpp
-	$(CC) $(CFLAGS) -c $^
 
 # Target for compiling the InitShader.cpp file.
 InitShader.o: Common/InitShader.cpp
@@ -33,4 +25,4 @@ objTest.o: objTest.cpp
 
 # Target for cleaning files generated during editing and compilation.
 clean:
-	rm -f spin-sq objTest *~ *.o
+	rm -f objTest *~ *.o
